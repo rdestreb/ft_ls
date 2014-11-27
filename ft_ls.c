@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/27 13:15:28 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/11/27 19:37:30 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,26 +18,42 @@ void	print_error(void)
 	exit (1);
 }
 
-/*int	arg_parser(int ac, char **av)
+t_opt	*arg_parser(int ac, char **av)
 {
-	t_opt	*flag;
 	int		i;
-	int		j;
+	t_opt	*flag;
 
 	i = -1;
-	while (++i < argc)
+	flag = (t_opt *)ft_memalloc(sizeof(t_opt));
+	while (++i < ac)
 	{
-		if (argv[i][0] == '-')
+		if (av[i][0] == '-')
 		{
-			j = -1;
-			while (argv[i][++j])
-			{
-				if (argv[i][j] == 'l')
-					flag->l = TRUE;
-			}
+			flag->l = (ft_strchr(av[i], 'l') ? flag->l + 1 : flag->l);
+			flag->rec = (ft_strchr(av[i], 'R') ? flag->rec + 1 : flag->rec);
+			flag->a = (ft_strchr(av[i], 'a') ? flag->a + 1 : flag->a);
+			flag->r = (ft_strchr(av[i], 'r') ? flag->r + 1 : flag->r);
+			flag->t = (ft_strchr(av[i], 't') ? flag->t + 1 : flag->t);
 		}
 	}
-}*/
+	return (flag);
+}
+
+void	get_infos(t_stat *info, t_dir *file)
+{
+	ft_putstr(" ");
+	ft_putnbr(info->st_nlink);
+	ft_putstr(" ");
+	ft_putstr(getpwuid(info->st_uid)->pw_name);
+	ft_putstr(" ");
+	ft_putstr(getgrgid(info->st_gid)->gr_name);
+	ft_putstr(" ");
+	ft_putnbr(info->st_size);
+	ft_putstr(" ");
+	ft_putstr(ft_strsub(ctime(&info->st_mtime), 4, 12));
+	ft_putstr(" ");
+	ft_putendl(file->d_name);
+}
 
 void	get_permission(int path)
 {
@@ -57,9 +73,16 @@ int	main(int ac, char **av)
 {
 	DIR		*dir;
 	t_dir	*file;
-	t_stat	info[50];
+	t_stat	info[100];
+	t_opt	*flag;
 //	struct stat	info;
 
+	flag = arg_parser(ac, av);
+	ft_putnbr(flag->l);
+	ft_putnbr(flag->rec);
+	ft_putnbr(flag->a);
+	ft_putnbr(flag->r);
+	ft_putnbr(flag->t);
 	if (ac == 1)
 		dir = opendir(".");
 	else
@@ -73,19 +96,11 @@ int	main(int ac, char **av)
 		{
 			if(stat(file->d_name, info) == -1)
 				print_error();
-
-			ft_putstr("\n");
-			ft_putendl(file->d_name);
-
 			get_permission(info->st_mode);
+			get_infos(info, file);
+			//ft_putstr(file->d_name);
+			//	ft_putstr("\n");
 
-			ft_putnbr(info->st_nlink);
-			ft_putstr("\n");
-			ft_putendl(getpwuid(info->st_uid)->pw_name);
-			ft_putendl(getgrgid(info->st_gid)->gr_name);
-			ft_putnbr(info->st_size);
-			ft_putstr("\n");
-			ft_putstr(ctime(&info->st_mtime));
 		}
 	}
 	if (closedir(dir) !=0)

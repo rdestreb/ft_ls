@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/27 11:05:49 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/11/27 14:41:37 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 typedef struct	s_opt
 {
 	int	l;
-	int	R;
+	int	rec;
 	int	a;
 	int	r;
 	int	t;
