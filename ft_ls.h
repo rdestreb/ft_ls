@@ -6,12 +6,15 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/26 13:21:48 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/11/27 11:05:49 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef		FT_LS_H
 # define	FT_LS_H
+
+# define TRUE 1
+# define FALSE 0
 
 # include <sys/types.h>
 # include <sys/stat.h>
@@ -25,6 +28,15 @@
 # include <grp.h>
 # include <time.h>
 # include "libft/libft.h"
+
+typedef struct	s_opt
+{
+	int	l;
+	int	R;
+	int	a;
+	int	r;
+	int	t;
+}				t_opt;
 
 typedef struct dirent t_dir;
 typedef struct stat  t_stat;
