@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/11/28 17:42:36 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/01 20:18:28 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void	print_error(char *error)
 {
 	ft_putstr_fd("ft_ls: ", 2);
 	perror(error);
-	exit(1);
 }
 
 void	illegal_option(char *arg)
@@ -54,6 +53,7 @@ t_opt	*arg_parser(int ac, char **av)
 			flag->a = (ft_strchr(av[i], 'a') ? flag->a + 1 : flag->a);
 			flag->r = (ft_strchr(av[i], 'r') ? flag->r + 1 : flag->r);
 			flag->t = (ft_strchr(av[i], 't') ? flag->t + 1 : flag->t);
+			(flag->nb_opt)++;
 		}
 	}
 	return (flag);
@@ -61,18 +61,12 @@ t_opt	*arg_parser(int ac, char **av)
 
 void	get_infos(t_stat *info, t_dir *file)
 {
-	ft_putstr(" ");
-	ft_putnbr(info->st_nlink);
-	ft_putstr(" ");
-	ft_putstr(getpwuid(info->st_uid)->pw_name);
-	ft_putstr(" ");
-	ft_putstr(getgrgid(info->st_gid)->gr_name);
-	ft_putstr(" ");
-	ft_putnbr(info->st_size);
-	ft_putstr(" ");
-	ft_putstr(ft_strsub(ctime(&info->st_mtime), 4, 12));
-	ft_putstr(" ");
-	ft_putendl(file->d_name);
+	ft_putstr(ft_strjoin(" ", ft_itoa(info->st_nlink)));
+	ft_putstr(ft_strjoin(" ", getpwuid(info->st_uid)->pw_name));
+	ft_putstr(ft_strjoin(" ", getgrgid(info->st_gid)->gr_name));
+	ft_putstr(ft_strjoin(" ", ft_itoa(info->st_size)));
+	ft_putstr(ft_strjoin(" ", ft_strsub(ctime(&info->st_mtime), 4, 12)));
+	ft_putendl(ft_strjoin(" ", file->d_name));
 }
 
 void	get_permission(int path)
@@ -89,83 +83,60 @@ void	get_permission(int path)
 	ft_putstr((path & S_IXOTH) ? "x" : "-");
 }
 
-void	read_dir(char *path)
+/*char	*pathing(char *path, char *file_name)
+{
+	char	*tmp;
+
+	tmp = ft_strchr(path, "/");
+	tmp = ft_strjoin(tmp, file_name);
+}
+*/
+void	read_dir(char *path, t_opt *flag)
 {
 	DIR		*dir;
 	t_dir	*file;
 	t_stat	info[100];
+	char	*path2;
 
 	if (!(dir = opendir(path)))
-		print_error(path);
+		return (print_error(path));
 	while ((file = readdir(dir)))
 	{
-		if (ft_strncmp(file->d_name , ".", 1) != 0)
+		if (/*!(flag->a) && */ft_strncmp(file->d_name , ".", 1))
 		{
-			stat(file->d_name, info);
-			if (S_ISDIR(info->st_mode))
-				read_dir(file->d_name);
-			else
-			{
-				get_permission(info->st_mode);
-				get_infos(info, file);
-				//ft_putstr(file->d_name);
-				//	ft_putstr("\n");
-			}
+			path2 = ft_strjoin(ft_strjoin(path, "/"), file->d_name);
+			stat(path2, info);
+			get_permission(info->st_mode);
+			get_infos(info, file);
+			if (flag->rec && file->d_type == DT_DIR)
+				read_dir(path2, flag);
+			ft_strdel(&path2);
 		}
 	}
 	if (closedir(dir) != 0)
-		print_error("");
+		return (print_error(""));
 }
 
 int	main(int ac, char **av)
 {
-//	DIR		*dir;
 	t_opt	*flag;
-	char	*path;
 
 	flag = arg_parser(ac, av);
+
 	ft_putnbr(flag->l);
 	ft_putnbr(flag->rec);
 	ft_putnbr(flag->a);
 	ft_putnbr(flag->r);
 	ft_putnbr(flag->t);
 	ft_putstr("\n");
+	ft_putnbr(flag->nb_opt);
 
-	//if (ac == 1)
-	//dir = opendir(".");
-	while(ac > 0)
+	if (ac == (flag->nb_opt + 1))
+		read_dir(".", flag);
+	else
 	{
-	ft_putnbr(ac);
-		ft_putstr ("coucou");
-		if (ft_strchr(av[ac], '-')){
-			ft_putstr("hello");
-			ac--;
-		}
-		else
-		{
-			if (ac == 1 || ft_strchr(path, '-'))
-				path = ".";
-			read_dir(path);
-		}
-/*
-		if (!(dir = opendir(".")))
-			print_error(path);
-		while ((file = readdir(dir)))
-		{
-			if (ft_strncmp(file->d_name , ".", 1) != 0)
-			{
-				stat(file->d_name, info);
-				get_permission(info->st_mode);
-			get_infos(info, file);
-			//ft_putstr(file->d_name);
-			//	ft_putstr("\n");
-
-			}
-		}
-		if (closedir(dir) !=0)
-		print_error("");
-*/
-		ac--;
+		while(ac-- > 1 /*&& !ft_strchr(av[ac], '-')*/)
+			read_dir(av[ac], flag);
 	}
 	return (0);
 }
