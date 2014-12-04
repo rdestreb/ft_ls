@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/03 17:54:34 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/04 16:24:56 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,14 +98,34 @@ void	get_infos(t_stat *info, t_dir *file)
 		ft_putstr(ft_strjoin(" ", getgrgid(info->st_gid)->gr_name));
 		ft_putstr(ft_strjoin(" ", ft_itoa(info->st_size)));
 		ft_putstr(ft_strjoin(" ", ft_strsub(ctime(&info->st_mtime), 4, 12)));
+		ft_putstr(" ");
 	}
-	ft_putendl(ft_strjoin(" ", file->d_name));
+	ft_putendl(file->d_name);
 }
 
 void	read_dir(char *path)
 {
 	DIR		*dir;
 	t_dir	*file;
+	t_opt	*flag;
+
+	flag = singleton();
+	if (!(dir = opendir(path)))
+		return (print_error(path));
+	while ((file = readdir(dir)))
+	{
+		if (flag->a || (!(flag->a) && ft_strncmp(file->d_name , ".", 1)))
+			display(path, file);
+		else if(flag->rec && ft_strcmp(file->d_name , ".")
+				&& ft_strcmp(file->d_name, ".."))
+				display(path, file);
+	}
+	if (closedir(dir) != 0)
+		return (print_error(""));
+}
+
+void	display(char * path, t_dir *file)
+{
 	t_stat	*info;
 	char	*path2;
 	t_opt	*flag;
@@ -113,23 +133,18 @@ void	read_dir(char *path)
 	if(!(info = (t_stat *)ft_memalloc(sizeof(t_stat))))
 		return ;
 	flag = singleton();
-	if (!(dir = opendir(path)))
-		return (print_error(path));
-	while ((file = readdir(dir)))
+	path2 = ft_strjoin(ft_strjoin(path, "/"), file->d_name);
+	stat(path2, info);
+	get_infos(info, file);
+	if (flag->rec && file->d_type == DT_DIR
+		&& ft_strcmp(file->d_name , ".") && ft_strcmp(file->d_name, ".."))
 	{
-	if (!(flag->a) && ft_strncmp(file->d_name , ".", 1))
-	{
-		path2 = ft_strjoin(ft_strjoin(path, "/"), file->d_name);
-		stat(path2, info);
-		get_infos(info, file);
-		if (flag->rec && file->d_type == DT_DIR && ft_strcmp(file->d_name , ".")
-			&& ft_strcmp(file->d_name, ".."))
-			read_dir(path2);
-		ft_strdel(&path2);
+		//ft_putendl("");
+		ft_putendl(ft_strjoin("\n",path2));
+		//	flag->a = 1;
+		read_dir(path2);
 	}
-	}
-	if (closedir(dir) != 0)
-		return (print_error(""));
+	ft_strdel(&path2);
 }
 
 int	main(int ac, char **av)

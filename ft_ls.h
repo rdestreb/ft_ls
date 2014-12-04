@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/01 20:09:34 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/04 15:02:02 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,7 @@ typedef struct	s_opt
 
 typedef struct dirent t_dir;
 typedef struct stat  t_stat;
+
+void	display(char * path, t_dir *file);
 
 #endif
