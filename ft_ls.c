@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/04 16:24:56 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/05 12:17:24 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,28 +79,51 @@ void	get_permission(int path)
 	ft_putstr((path & S_IROTH) ? "r" : "-");
 	ft_putstr((path & S_IWOTH) ? "w" : "-");
 	ft_putstr((path & S_IXOTH) ? "x" : "-");
+	ft_putstr(" ");
 }
 
-void	get_infos(t_stat *info, t_dir *file)
+/*void	get_links(char *path)
 {
-//	static int	nb_blocks;
+
+}
+*/
+void	print_infos(t_stat *p_stat, t_info *p_data)
+{
 	t_opt	*flag;
 
 	flag = singleton();
 	if (flag->l)
 	{
-//		nb_blocks =+ info->st_blocks;
-		//	ft_putnbr(nb_blocks);
-		get_permission(info->st_mode);
+//		ft_putnbr(p_info->nblock);
+//		ft_putstr("\n");
+		get_permission(p_stat->st_mode);
+		ft_putnbr(p_data->link);
 		ft_putstr(" ");
-		ft_putnbr(info->st_nlink);
-		ft_putstr(ft_strjoin(" ", getpwuid(info->st_uid)->pw_name));
-		ft_putstr(ft_strjoin(" ", getgrgid(info->st_gid)->gr_name));
-		ft_putstr(ft_strjoin(" ", ft_itoa(info->st_size)));
-		ft_putstr(ft_strjoin(" ", ft_strsub(ctime(&info->st_mtime), 4, 12)));
+		ft_putstr(p_data->gid);
+		ft_putstr(" ");
+		ft_putnbr(p_data->size);
+		ft_putstr(" ");
+		ft_putstr(p_data->date);
+		ft_putstr(" ");
+		ft_putstr(p_data->uid);
 		ft_putstr(" ");
 	}
-	ft_putendl(file->d_name);
+	ft_putendl(p_data->name);
+}
+void	get_infos(t_stat *p_stat, t_dir *file)
+{
+	t_info		*p_data;
+
+	if(!(p_data = (t_info *)ft_memalloc(sizeof(t_info))))
+	   return ;
+//	p_data->nblock =+ p_stat->st_blocks;
+	p_data->link = p_stat->st_nlink;
+	p_data->uid =  getpwuid(p_stat->st_uid)->pw_name;
+	p_data->gid =  getgrgid(p_stat->st_gid)->gr_name;
+	p_data->size = p_stat->st_size;
+	p_data->date = ft_strsub(ctime(&p_stat->st_mtime), 4, 12);
+	p_data->name = file->d_name;
+	print_infos (p_stat, p_data);
 }
 
 void	read_dir(char *path)
@@ -126,22 +149,20 @@ void	read_dir(char *path)
 
 void	display(char * path, t_dir *file)
 {
-	t_stat	*info;
+	t_stat	*p_stat;
 	char	*path2;
 	t_opt	*flag;
 
-	if(!(info = (t_stat *)ft_memalloc(sizeof(t_stat))))
+	if(!(p_stat = (t_stat *)ft_memalloc(sizeof(t_stat))))
 		return ;
 	flag = singleton();
 	path2 = ft_strjoin(ft_strjoin(path, "/"), file->d_name);
-	stat(path2, info);
-	get_infos(info, file);
+	stat(path2, p_stat);
+	get_infos(p_stat, file);
 	if (flag->rec && file->d_type == DT_DIR
 		&& ft_strcmp(file->d_name , ".") && ft_strcmp(file->d_name, ".."))
 	{
-		//ft_putendl("");
-		ft_putendl(ft_strjoin("\n",path2));
-		//	flag->a = 1;
+		ft_putendl(ft_strjoin(ft_strjoin("\n",path2), ":"));
 		read_dir(path2);
 	}
 	ft_strdel(&path2);

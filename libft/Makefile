@@ -6,7 +6,7 @@
 #    By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/03 12:22:32 by rdestreb          #+#    #+#              #
-#    Updated: 2014/12/01 15:50:00 by rdestreb         ###   ########.fr        #
+#    Updated: 2014/12/05 11:33:10 by rdestreb         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -15,7 +15,7 @@ NAME = libft.a
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 HEADERFILES = libft.h
-HEADERDIR = ./includes/
+HEADERDIR = ./
 HEADER = $(addprefix $(HEADERDIR), $(HEADERFILES))
 SRCSDIR = ./
 SRCS = $(addprefix $(SRCSDIR), $(SRCSFILES))

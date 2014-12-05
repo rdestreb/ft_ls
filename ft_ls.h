@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/04 15:02:02 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/05 17:52:26 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 # include <pwd.h>
 # include <grp.h>
 # include <time.h>
-# include "libft/includes/libft.h"
+# include "libft/libft.h"
 
 typedef struct	s_opt
 {
@@ -39,9 +39,26 @@ typedef struct	s_opt
 	int nb_opt;
 }				t_opt;
 
+typedef struct s_data t_data;
+
+struct	s_data
+{
+	int		link;
+	char	*uid;
+	char	*gid;
+	int		size;
+	char	*date;
+	char	*name;
+	t_data	*next;
+//	t_data	*prev;
+};
+
 typedef struct dirent t_dir;
 typedef struct stat  t_stat;
 
 void	display(char * path, t_dir *file);
+t_data	*init_list(void);
+t_data	*add_link(char *name);
+
 
 #endif

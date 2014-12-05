@@ -6,7 +6,7 @@
 #    By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/25 10:38:16 by rdestreb          #+#    #+#              #
-#    Updated: 2014/12/01 15:56:15 by rdestreb         ###   ########.fr        #
+#    Updated: 2014/12/05 17:51:18 by rdestreb         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -16,7 +16,8 @@ HEADDIR = ./
 HEAD = ft_ls.h
 HEADFILES = $(addprefix $(HEADDIR)/, $(HEAD))
 SCRFILES = $(addprefix $(SRCDIR)/, $(SRC))
-SRC =	ft_ls.c
+SRC =	ft_ls.c \
+		list.c
 
 
 OBJS = $(SCRFILES:.c=.o)
