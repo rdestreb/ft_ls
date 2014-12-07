@@ -40,6 +40,9 @@ typedef struct	s_opt
 }				t_opt;
 
 typedef struct s_data t_data;
+typedef struct s_lst t_lst;
+typedef struct dirent t_dir;
+typedef struct stat  t_stat;
 
 struct	s_data
 {
@@ -49,16 +52,24 @@ struct	s_data
 	int		size;
 	char	*date;
 	char	*name;
-	t_data	*next;
-//	t_data	*prev;
+	t_dir	*file;
+	t_stat	*p_stat;
 };
 
-typedef struct dirent t_dir;
-typedef struct stat  t_stat;
+struct	s_lst
+{
+	t_data	*data;
+	t_lst	*next;
+};
 
-void	display(char * path, t_dir *file);
-t_data	*init_list(void);
-t_data	*add_link(char *name);
+
+void	display(char * path, t_dir *file, t_lst *lst);
+t_opt	*singleton(void);
+void	print_infos(t_data *p_data);
+t_lst	*add_link(t_data *data, t_lst *lst);
+void	disp_list(t_lst *lst);
+void	read_list(t_lst *lst, char *path);
+
 
 
 #endif

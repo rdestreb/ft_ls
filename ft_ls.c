@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_ls.h"
+#include <stdio.h>
 
 t_opt	*singleton(void)
 {
@@ -87,7 +88,7 @@ void	get_permission(int path)
 
 }
 */
-void	print_infos(t_stat *p_stat, t_info *p_data)
+void	print_infos(t_data *p_data)
 {
 	t_opt	*flag;
 
@@ -96,7 +97,7 @@ void	print_infos(t_stat *p_stat, t_info *p_data)
 	{
 //		ft_putnbr(p_info->nblock);
 //		ft_putstr("\n");
-		get_permission(p_stat->st_mode);
+		get_permission(p_data->p_stat->st_mode);
 		ft_putnbr(p_data->link);
 		ft_putstr(" ");
 		ft_putstr(p_data->gid);
@@ -110,11 +111,12 @@ void	print_infos(t_stat *p_stat, t_info *p_data)
 	}
 	ft_putendl(p_data->name);
 }
-void	get_infos(t_stat *p_stat, t_dir *file)
-{
-	t_info		*p_data;
 
-	if(!(p_data = (t_info *)ft_memalloc(sizeof(t_info))))
+void	get_infos(t_stat *p_stat, t_dir *file, t_lst *lst)
+{
+	t_data		*p_data;
+
+	if(!(p_data = (t_data *)ft_memalloc(sizeof(t_data))))
 	   return ;
 //	p_data->nblock =+ p_stat->st_blocks;
 	p_data->link = p_stat->st_nlink;
@@ -122,8 +124,13 @@ void	get_infos(t_stat *p_stat, t_dir *file)
 	p_data->gid =  getgrgid(p_stat->st_gid)->gr_name;
 	p_data->size = p_stat->st_size;
 	p_data->date = ft_strsub(ctime(&p_stat->st_mtime), 4, 12);
-	p_data->name = file->d_name;
-	print_infos (p_stat, p_data);
+	p_data->name = ft_strdup(file->d_name);
+	p_data->p_stat = p_stat;
+	p_data->file = file;
+	p_data->file = (t_dir *)ft_memalloc(sizeof(t_dir));
+	ft_memcpy(p_data->file, file, sizeof(t_dir));
+//	printf("\nADD : %s\n", p_data->name);
+	add_link(p_data, lst);
 }
 
 void	read_dir(char *path)
@@ -131,40 +138,67 @@ void	read_dir(char *path)
 	DIR		*dir;
 	t_dir	*file;
 	t_opt	*flag;
+	t_lst	*lst;
 
 	flag = singleton();
 	if (!(dir = opendir(path)))
 		return (print_error(path));
+	lst = (t_lst *)ft_memalloc(sizeof(t_lst));
 	while ((file = readdir(dir)))
 	{
-		if (flag->a || (!(flag->a) && ft_strncmp(file->d_name , ".", 1)))
-			display(path, file);
+		if (flag->a || (!(flag->a) && ft_strncmp(file->d_name, ".", 1)))
+			display(path, file ,lst);
 		else if(flag->rec && ft_strcmp(file->d_name , ".")
 				&& ft_strcmp(file->d_name, ".."))
-				display(path, file);
+			display(path, file, lst);
 	}
+	disp_list(lst);
 	if (closedir(dir) != 0)
 		return (print_error(""));
+	if (flag->rec){
+		read_list(lst, path);
+	}
 }
 
-void	display(char * path, t_dir *file)
+void	read_list(t_lst *lst, char *path)
+{
+	char	*path2;
+	t_dir	*file;
+
+	lst = lst->next;
+	while (lst)
+	{
+		file = lst->data->file;
+		if (file->d_type == DT_DIR && ft_strcmp(lst->data->name , ".") &&
+			ft_strcmp(lst->data->name, ".."))
+		{
+			path2 = ft_strjoin(ft_strjoin(path, "/"), lst->data->name);
+			ft_putendl(ft_strjoin(ft_strjoin("\n",path2), ":"));
+			read_dir(path2);
+			ft_strdel(&path2);
+		}
+		lst = lst->next;
+	}
+}
+
+void	display(char *path, t_dir *file, t_lst *lst)
 {
 	t_stat	*p_stat;
 	char	*path2;
-	t_opt	*flag;
+//	t_opt	*flag;
 
 	if(!(p_stat = (t_stat *)ft_memalloc(sizeof(t_stat))))
 		return ;
-	flag = singleton();
+//	flag = singleton();
 	path2 = ft_strjoin(ft_strjoin(path, "/"), file->d_name);
 	stat(path2, p_stat);
-	get_infos(p_stat, file);
-	if (flag->rec && file->d_type == DT_DIR
+	get_infos(p_stat, file, lst);
+	/*if (flag->rec && file->d_type == DT_DIR
 		&& ft_strcmp(file->d_name , ".") && ft_strcmp(file->d_name, ".."))
 	{
 		ft_putendl(ft_strjoin(ft_strjoin("\n",path2), ":"));
 		read_dir(path2);
-	}
+	}*/
 	ft_strdel(&path2);
 }
 
@@ -183,11 +217,16 @@ int	main(int ac, char **av)
 	ft_putnbr(flag->nb_opt);
 */
 	if (ac == (flag->nb_opt + 1))
+	{
 		read_dir(".");
+//		disp_list();
+	}
 	else
 	{
 		while(ac-- > 1 && (ac > flag->nb_opt))
+		{
 			read_dir(av[ac]);
+		}
 	}
 	return (0);
 }

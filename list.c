@@ -12,28 +12,50 @@
 
 #include "ft_ls.h"
 
-t_data	*init_list(void)
+/*t_lst	*init_list(int reset)
 {
-	static t_data	*lst = NULL;
+	static t_lst	*lst = NULL;
 
+	if (reset)
+		lst = NULL;
 	if(!lst)
-		lst = (t_data *)ft_memalloc(sizeof(t_data));
+		lst = (t_lst *)ft_memalloc(sizeof(t_lst));
 	return (lst);
 }
-
-t_data	*add_link(char *name)
+*/
+t_lst	*add_link(t_data *data, t_lst *lst)
 {
-	t_data	*lst;
-	t_data	*add;
-	t_data	*tmp;
+	t_lst	*add;
+	t_lst	*tmp;
+	t_opt	*flag;
 
-	lst = init_list();
-	add = (t_data *)ft_memalloc(sizeof(t_data));
-	add->name = ft_strdup(name);
-	while (lst && lst->next && (ft_strcmp(add->name, lst->next->name) >= 0))
-		lst = lst->next;
+	flag = singleton();
+	add = (t_lst *)ft_memalloc(sizeof(t_lst));
+	add->data = data;
+	if (flag->r)
+	{
+		while (lst && lst->next &&
+				(ft_strcmp(add->data->name, lst->next->data->name) < 0))
+			lst = lst->next;
+	}
+	else
+	{
+		while (lst && lst->next &&
+				(ft_strcmp(add->data->name, lst->next->data->name) >= 0))
+			lst = lst->next;
+	}
 	tmp = lst->next;
 	lst->next = add;
 	add->next = tmp;
 	return (lst);
+}
+
+void	disp_list(t_lst *lst)
+{
+	lst = lst->next;
+	while(lst)
+	{
+		print_infos(lst->data);
+		lst = lst->next;
+	}
 }
