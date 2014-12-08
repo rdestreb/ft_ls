@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/05 12:17:24 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/08 18:17:15 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ void	illegal_option(char *arg)
 			&& arg[i] != 't')
 		{
 			ft_putstr_fd("ft_ls: illegal option -- ", 2);
-		ft_putchar_fd(arg[i], 2);
-		ft_putstr_fd("\nusage: ft_ls [-Ralrt] [file ...]\n", 2);
-		exit(1);
+			ft_putchar_fd(arg[i], 2);
+			ft_putstr_fd("\nusage: ft_ls [-Ralrt] [file ...]\n", 2);
+			exit(1);
 		}
 	}
 }
@@ -57,20 +57,29 @@ t_opt	*arg_parser(int ac, char **av)
 	flag = singleton();
 	while (++i < ac && av[i][0] == '-')
 	{
-			illegal_option(av[i]);
-			flag->l = (ft_strchr(av[i], 'l') ? flag->l + 1 : flag->l);
-			flag->rec = (ft_strchr(av[i], 'R') ? flag->rec + 1 : flag->rec);
-			flag->a = (ft_strchr(av[i], 'a') ? flag->a + 1 : flag->a);
-			flag->r = (ft_strchr(av[i], 'r') ? flag->r + 1 : flag->r);
-			flag->t = (ft_strchr(av[i], 't') ? flag->t + 1 : flag->t);
-			(flag->nb_opt)++;
+		illegal_option(av[i]);
+		flag->l = (ft_strchr(av[i], 'l') ? flag->l + 1 : flag->l);
+		flag->rec = (ft_strchr(av[i], 'R') ? flag->rec + 1 : flag->rec);
+		flag->a = (ft_strchr(av[i], 'a') ? flag->a + 1 : flag->a);
+		flag->r = (ft_strchr(av[i], 'r') ? flag->r + 1 : flag->r);
+		flag->t = (ft_strchr(av[i], 't') ? flag->t + 1 : flag->t);
+		(flag->nb_opt)++;
 	}
 	return (flag);
 }
 
-void	get_permission(int path)
+void	get_permission(int path, t_dir *file)
 {
-	ft_putstr(S_ISDIR(path) ? "d" : "-");
+	if (file->d_type == DT_LNK)
+		ft_putstr("l");
+	else if (file->d_type == DT_BLK)
+		ft_putstr("b");
+	else if (file->d_type == DT_CHR)
+		ft_putstr("c");
+	else if (file->d_type == DT_DIR)
+		ft_putstr("d");
+	else
+		ft_putstr("-");
 	ft_putstr((path & S_IRUSR) ? "r" : "-");
 	ft_putstr((path & S_IWUSR) ? "w" : "-");
 	ft_putstr((path & S_IXUSR) ? "x" : "-");
@@ -95,41 +104,57 @@ void	print_infos(t_data *p_data)
 	flag = singleton();
 	if (flag->l)
 	{
-//		ft_putnbr(p_info->nblock);
-//		ft_putstr("\n");
-		get_permission(p_data->p_stat->st_mode);
+		get_permission(p_data->p_stat->st_mode, p_data->file);
 		ft_putnbr(p_data->link);
 		ft_putstr(" ");
-		ft_putstr(p_data->gid);
+		ft_putstr(p_data->uid);
+		ft_putstr(" ");
+	ft_putstr(p_data->gid);
 		ft_putstr(" ");
 		ft_putnbr(p_data->size);
 		ft_putstr(" ");
 		ft_putstr(p_data->date);
 		ft_putstr(" ");
-		ft_putstr(p_data->uid);
-		ft_putstr(" ");
-	}
+		}
 	ft_putendl(p_data->name);
+}
+
+void	get_link(t_stat *p_stat, t_dir *file, t_lst *lst, t_data *p_data)
+{
+	char	*link;
+	int		ret;
+
+	if(!(link = (char *)ft_memalloc(sizeof(int) * p_stat->st_size + 1)))
+		return (print_error(""));
+	ft_putnbr (p_stat->st_size);
+	if((ret = readlink(lst->path, link, p_stat->st_size + 1)) == -1)
+		return (print_error(""));
+	link[p_stat->st_size + 1] = 0;
+	p_data->name = ft_strjoin(ft_strjoin(file->d_name," -> "), link);
 }
 
 void	get_infos(t_stat *p_stat, t_dir *file, t_lst *lst)
 {
 	t_data		*p_data;
+	static int	nblock = 0;
 
 	if(!(p_data = (t_data *)ft_memalloc(sizeof(t_data))))
 	   return ;
-//	p_data->nblock =+ p_stat->st_blocks;
+	nblock += p_stat->st_blocks;
+	p_data->nblock = nblock;
 	p_data->link = p_stat->st_nlink;
 	p_data->uid =  getpwuid(p_stat->st_uid)->pw_name;
 	p_data->gid =  getgrgid(p_stat->st_gid)->gr_name;
 	p_data->size = p_stat->st_size;
 	p_data->date = ft_strsub(ctime(&p_stat->st_mtime), 4, 12);
-	p_data->name = ft_strdup(file->d_name);
+	if (file->d_type == DT_LNK)
+		get_link(p_stat, file, lst, p_data);
+	else
+		p_data->name = ft_strdup(file->d_name);
 	p_data->p_stat = p_stat;
 	p_data->file = file;
 	p_data->file = (t_dir *)ft_memalloc(sizeof(t_dir));
 	ft_memcpy(p_data->file, file, sizeof(t_dir));
-//	printf("\nADD : %s\n", p_data->name);
 	add_link(p_data, lst);
 }
 
@@ -149,23 +174,21 @@ void	read_dir(char *path)
 		if (flag->a || (!(flag->a) && ft_strncmp(file->d_name, ".", 1)))
 			display(path, file ,lst);
 		else if(flag->rec && ft_strcmp(file->d_name , ".")
-				&& ft_strcmp(file->d_name, ".."))
+					&& ft_strcmp(file->d_name, ".."))
 			display(path, file, lst);
 	}
-	disp_list(lst);
 	if (closedir(dir) != 0)
 		return (print_error(""));
-	if (flag->rec){
-		read_list(lst, path);
-	}
+//	if (flag->rec)
+	read_list(lst, path);
 }
 
-void	read_list(t_lst *lst, char *path)
+void	recursive(t_lst *lst, char *path, t_lst *first)
 {
-	char	*path2;
 	t_dir	*file;
+	char	*path2;
 
-	lst = lst->next;
+	lst = first->next;
 	while (lst)
 	{
 		file = lst->data->file;
@@ -181,30 +204,47 @@ void	read_list(t_lst *lst, char *path)
 	}
 }
 
+void	read_list(t_lst *lst, char *path)
+{
+	t_opt	*flag;
+	t_lst	*first;
+	t_lst	*last;
+
+	flag = singleton();
+	first = lst;
+	lst = lst->next;
+	while (lst)
+	{
+		last = lst;
+		lst = lst->next;
+	}
+	disp_list(lst, first, last);
+
+	if (flag->rec)
+		recursive(lst, path, first);
+}
+
 void	display(char *path, t_dir *file, t_lst *lst)
 {
 	t_stat	*p_stat;
 	char	*path2;
-//	t_opt	*flag;
 
 	if(!(p_stat = (t_stat *)ft_memalloc(sizeof(t_stat))))
 		return ;
-//	flag = singleton();
 	path2 = ft_strjoin(ft_strjoin(path, "/"), file->d_name);
-	stat(path2, p_stat);
+	lst->path = path2;
+	if (file->d_type == DT_LNK)
+		lstat(path2, p_stat);
+	else
+		stat(path2, p_stat);
 	get_infos(p_stat, file, lst);
-	/*if (flag->rec && file->d_type == DT_DIR
-		&& ft_strcmp(file->d_name , ".") && ft_strcmp(file->d_name, ".."))
-	{
-		ft_putendl(ft_strjoin(ft_strjoin("\n",path2), ":"));
-		read_dir(path2);
-	}*/
 	ft_strdel(&path2);
 }
 
 int	main(int ac, char **av)
 {
 	t_opt	*flag;
+	int		arg;
 
 	flag = arg_parser(ac, av);
 
@@ -216,16 +256,18 @@ int	main(int ac, char **av)
 	ft_putstr("\n");
 	ft_putnbr(flag->nb_opt);
 */
+	arg = ac - flag->nb_opt - 1;
 	if (ac == (flag->nb_opt + 1))
-	{
 		read_dir(".");
-//		disp_list();
-	}
 	else
 	{
 		while(ac-- > 1 && (ac > flag->nb_opt))
 		{
+			if (arg > 1)
+				ft_putendl(ft_strjoin(av[ac], ":"));
 			read_dir(av[ac]);
+			if (arg > 1 && ac - flag->nb_opt <= arg && ac > flag->nb_opt + 1)
+				ft_putstr("\n");
 		}
 	}
 	return (0);
