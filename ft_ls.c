@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/08 18:17:15 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/08 19:56:15 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,22 +126,19 @@ void	get_link(t_stat *p_stat, t_dir *file, t_lst *lst, t_data *p_data)
 
 	if(!(link = (char *)ft_memalloc(sizeof(int) * p_stat->st_size + 1)))
 		return (print_error(""));
-	ft_putnbr (p_stat->st_size);
 	if((ret = readlink(lst->path, link, p_stat->st_size + 1)) == -1)
 		return (print_error(""));
 	link[p_stat->st_size + 1] = 0;
 	p_data->name = ft_strjoin(ft_strjoin(file->d_name," -> "), link);
 }
 
-void	get_infos(t_stat *p_stat, t_dir *file, t_lst *lst)
+void	get_infos(t_stat *p_stat, t_dir *file, t_lst *lst, int *nblock)
 {
 	t_data		*p_data;
-	static int	nblock = 0;
 
 	if(!(p_data = (t_data *)ft_memalloc(sizeof(t_data))))
 	   return ;
-	nblock += p_stat->st_blocks;
-	p_data->nblock = nblock;
+	*nblock += p_stat->st_blocks;
 	p_data->link = p_stat->st_nlink;
 	p_data->uid =  getpwuid(p_stat->st_uid)->pw_name;
 	p_data->gid =  getgrgid(p_stat->st_gid)->gr_name;
@@ -164,7 +161,9 @@ void	read_dir(char *path)
 	t_dir	*file;
 	t_opt	*flag;
 	t_lst	*lst;
+	int		nblock;
 
+	nblock = 0;
 	flag = singleton();
 	if (!(dir = opendir(path)))
 		return (print_error(path));
@@ -172,15 +171,15 @@ void	read_dir(char *path)
 	while ((file = readdir(dir)))
 	{
 		if (flag->a || (!(flag->a) && ft_strncmp(file->d_name, ".", 1)))
-			display(path, file ,lst);
+			display(path, file ,lst, &nblock);
 		else if(flag->rec && ft_strcmp(file->d_name , ".")
 					&& ft_strcmp(file->d_name, ".."))
-			display(path, file, lst);
+			display(path, file, lst, &nblock);
 	}
 	if (closedir(dir) != 0)
 		return (print_error(""));
 //	if (flag->rec)
-	read_list(lst, path);
+	read_list(lst, path, &nblock);
 }
 
 void	recursive(t_lst *lst, char *path, t_lst *first)
@@ -204,7 +203,7 @@ void	recursive(t_lst *lst, char *path, t_lst *first)
 	}
 }
 
-void	read_list(t_lst *lst, char *path)
+void	read_list(t_lst *lst, char *path, int *nblock)
 {
 	t_opt	*flag;
 	t_lst	*first;
@@ -218,13 +217,13 @@ void	read_list(t_lst *lst, char *path)
 		last = lst;
 		lst = lst->next;
 	}
-	disp_list(lst, first, last);
+	disp_list(lst, first, last, nblock);
 
 	if (flag->rec)
 		recursive(lst, path, first);
 }
 
-void	display(char *path, t_dir *file, t_lst *lst)
+void	display(char *path, t_dir *file, t_lst *lst, int *nblock)
 {
 	t_stat	*p_stat;
 	char	*path2;
@@ -237,7 +236,7 @@ void	display(char *path, t_dir *file, t_lst *lst)
 		lstat(path2, p_stat);
 	else
 		stat(path2, p_stat);
-	get_infos(p_stat, file, lst);
+	get_infos(p_stat, file, lst, nblock);
 	ft_strdel(&path2);
 }
 
@@ -272,6 +271,3 @@ int	main(int ac, char **av)
 	}
 	return (0);
 }
-
-
-

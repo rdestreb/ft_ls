@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/05 14:04:12 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/08 16:09:28 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/08 20:09:41 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ t_lst	*add_link(t_data *data, t_lst *lst)
 	return (lst);
 }
 
-void	disp_list(t_lst *lst, t_lst *first, t_lst *last)
+void	disp_list(t_lst *lst, t_lst *first, t_lst *last, int *nblock)
 {
 	t_opt	*flag;
 
@@ -58,7 +58,7 @@ void	disp_list(t_lst *lst, t_lst *first, t_lst *last)
 	if (last && flag->l)
 	{
 		ft_putstr("total ");
-		ft_putnbr(last->data->nblock);
+		ft_putnbr(*nblock);
 		ft_putstr("\n");
 	}
 	lst = first->next;
@@ -67,11 +67,28 @@ void	disp_list(t_lst *lst, t_lst *first, t_lst *last)
 		print_infos(lst->data);
 		lst = lst->next;
 	}
+	delete_list(lst);
 }
 
-/*
+
 void	delete_list(t_lst *lst)
 {
-
+	if (!lst)
+		return ;
+	if (lst->next)
+		delete_list(lst->next);
+	if (lst->data)
+	{
+		free(lst->data->file);
+		free(lst->data->name);
+		free(lst->data->p_stat);
+		free(lst->data->date);
+		free(lst->data->gid);
+		free(lst->data->uid);
+		free(lst->data);
+	}
+	free(lst->path);
+	free(lst);
 }
-*/
+
+

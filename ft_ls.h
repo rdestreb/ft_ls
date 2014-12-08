@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/08 12:08:18 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/08 20:06:23 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ typedef struct stat  t_stat;
 struct	s_data
 {
 	int		link;
-	int		nblock;
 	char	*uid;
 	char	*gid;
 	int		size;
@@ -65,12 +64,13 @@ struct	s_lst
 };
 
 
-void	display(char * path, t_dir *file, t_lst *lst);
+void	display(char * path, t_dir *file, t_lst *lst, int *nblock);
 t_opt	*singleton(void);
 void	print_infos(t_data *p_data);
 t_lst	*add_link(t_data *data, t_lst *lst);
-void	disp_list(t_lst *lst, t_lst *first, t_lst *last);
-void	read_list(t_lst *lst, char *path);
+void	disp_list(t_lst *lst, t_lst *first, t_lst *last, int *block);
+void	read_list(t_lst *lst, char *path, int *block);
+void    delete_list(t_lst *lst);
 
 
 
