@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/08 19:56:15 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/09 16:04:24 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,12 +92,38 @@ void	get_permission(int path, t_dir *file)
 	ft_putstr(" ");
 }
 
-/*void	get_links(char *path)
+void	padding(t_data *p_data, t_max *max)
 {
-
+	while(ft_strlen(p_data->link) <= max->m_link)
+		p_data->link = ft_strjoin(" ", p_data->link);
+	ft_putstr(p_data->link);
+	ft_putstr(" ");
+	while(ft_strlen(p_data->uid) <= max->m_uid)
+		p_data->uid = ft_strjoin(p_data->uid, " ");
+	ft_putstr(p_data->uid);
+	ft_putstr(" ");
+	while(ft_strlen(p_data->gid) <= max->m_gid)
+		p_data->gid = ft_strjoin(p_data->gid, " ");
+	ft_putstr(p_data->gid);
+	if (p_data->file->d_type == DT_BLK || p_data->file->d_type == DT_CHR)
+	{
+		while(ft_strlen(p_data->maj) <= max->m_maj)
+			p_data->maj = ft_strjoin(" ", p_data->maj);
+		ft_putstr(p_data->maj);
+			ft_putstr(",");
+		while(ft_strlen(p_data->min) <= max->m_min)
+			p_data->min = ft_strjoin(" ", p_data->min);
+		ft_putstr(p_data->min);
+	}
+	else
+	{
+		while(ft_strlen(p_data->size) <= max->m_size)
+			p_data->size = ft_strjoin(" ", p_data->size);
+		ft_putstr(p_data->size);
+	}
 }
-*/
-void	print_infos(t_data *p_data)
+
+void	print_infos(t_data *p_data, t_max *max)
 {
 	t_opt	*flag;
 
@@ -105,14 +131,10 @@ void	print_infos(t_data *p_data)
 	if (flag->l)
 	{
 		get_permission(p_data->p_stat->st_mode, p_data->file);
-		ft_putnbr(p_data->link);
-		ft_putstr(" ");
-		ft_putstr(p_data->uid);
-		ft_putstr(" ");
-	ft_putstr(p_data->gid);
-		ft_putstr(" ");
-		ft_putnbr(p_data->size);
-		ft_putstr(" ");
+//		ft_putnbr(p_data->link);
+//		ft_putstr(" ");
+		padding(p_data, max);
+//		ft_putnbr(p_data->size);
 		ft_putstr(p_data->date);
 		ft_putstr(" ");
 		}
@@ -123,13 +145,31 @@ void	get_link(t_stat *p_stat, t_dir *file, t_lst *lst, t_data *p_data)
 {
 	char	*link;
 	int		ret;
+	t_opt	*flag;
 
+	flag = singleton();
 	if(!(link = (char *)ft_memalloc(sizeof(int) * p_stat->st_size + 1)))
 		return (print_error(""));
 	if((ret = readlink(lst->path, link, p_stat->st_size + 1)) == -1)
 		return (print_error(""));
 	link[p_stat->st_size + 1] = 0;
-	p_data->name = ft_strjoin(ft_strjoin(file->d_name," -> "), link);
+	if (flag->l)
+		p_data->name = ft_strjoin(ft_strjoin(file->d_name," -> "), link);
+	else
+		p_data->name = ft_strdup(file->d_name);
+}
+
+void	get_time(t_stat *p_stat, t_data *p_data)
+{
+	char	*t_f;
+	time_t	t;
+
+	t = time(NULL);
+	t_f = ctime(&p_stat->st_mtime);
+	if (t < (p_stat->st_mtime) || (t > (p_stat->st_mtime) + 15778463))
+		p_data->date = ft_strjoin(ft_strsub(t_f, 3, 8), ft_strsub(t_f, 19, 5));
+	else
+		p_data->date = ft_strsub(t_f, 3, 13);
 }
 
 void	get_infos(t_stat *p_stat, t_dir *file, t_lst *lst, int *nblock)
@@ -139,16 +179,18 @@ void	get_infos(t_stat *p_stat, t_dir *file, t_lst *lst, int *nblock)
 	if(!(p_data = (t_data *)ft_memalloc(sizeof(t_data))))
 	   return ;
 	*nblock += p_stat->st_blocks;
-	p_data->link = p_stat->st_nlink;
+	p_data->link = ft_itoa(p_stat->st_nlink);
 	p_data->uid =  getpwuid(p_stat->st_uid)->pw_name;
 	p_data->gid =  getgrgid(p_stat->st_gid)->gr_name;
-	p_data->size = p_stat->st_size;
-	p_data->date = ft_strsub(ctime(&p_stat->st_mtime), 4, 12);
+	p_data->size = ft_itoa(p_stat->st_size);
+	get_time(p_stat, p_data);
 	if (file->d_type == DT_LNK)
 		get_link(p_stat, file, lst, p_data);
 	else
 		p_data->name = ft_strdup(file->d_name);
 	p_data->p_stat = p_stat;
+	p_data->maj = ft_itoa(major(p_data->p_stat->st_rdev));
+	p_data->min = ft_itoa(minor(p_data->p_stat->st_rdev));
 	p_data->file = file;
 	p_data->file = (t_dir *)ft_memalloc(sizeof(t_dir));
 	ft_memcpy(p_data->file, file, sizeof(t_dir));
@@ -178,7 +220,6 @@ void	read_dir(char *path)
 	}
 	if (closedir(dir) != 0)
 		return (print_error(""));
-//	if (flag->rec)
 	read_list(lst, path, &nblock);
 }
 
@@ -203,22 +244,39 @@ void	recursive(t_lst *lst, char *path, t_lst *first)
 	}
 }
 
+void	get_max(t_lst *lst, t_max *max)
+{
+
+	if (max->m_uid < ft_strlen(lst->data->uid))
+		max->m_uid = ft_strlen(lst->data->uid);
+	if (max->m_gid < ft_strlen(lst->data->gid))
+		max->m_gid = ft_strlen(lst->data->gid);
+	if (max->m_link < ft_strlen(lst->data->link))
+		max->m_link = ft_strlen(lst->data->link);
+	if (max->m_size < ft_strlen(lst->data->size))
+		max->m_size = ft_strlen(lst->data->size);
+	if (max->m_maj < ft_strlen(lst->data->maj))
+		max->m_maj = ft_strlen(lst->data->maj);
+	if (max->m_min < ft_strlen(lst->data->min))
+		max->m_min = ft_strlen(lst->data->min);
+}
+
 void	read_list(t_lst *lst, char *path, int *nblock)
 {
 	t_opt	*flag;
 	t_lst	*first;
-	t_lst	*last;
+	t_max	*max;
 
 	flag = singleton();
+	max = (t_max *)ft_memalloc(sizeof(t_max));
 	first = lst;
 	lst = lst->next;
 	while (lst)
 	{
-		last = lst;
+		get_max(lst, max);
 		lst = lst->next;
 	}
-	disp_list(lst, first, last, nblock);
-
+	disp_list(lst, first, nblock, max);
 	if (flag->rec)
 		recursive(lst, path, first);
 }

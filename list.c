@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/05 14:04:12 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/08 20:09:41 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/09 13:54:36 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,12 @@ t_lst	*add_link(t_data *data, t_lst *lst)
 	return (lst);
 }
 
-void	disp_list(t_lst *lst, t_lst *first, t_lst *last, int *nblock)
+void	disp_list(t_lst *lst, t_lst *first, int *nblock, t_max *max)
 {
 	t_opt	*flag;
 
 	flag = singleton();
-	if (last && flag->l)
+	if (flag->l)
 	{
 		ft_putstr("total ");
 		ft_putnbr(*nblock);
@@ -64,7 +64,7 @@ void	disp_list(t_lst *lst, t_lst *first, t_lst *last, int *nblock)
 	lst = first->next;
 	while(lst)
 	{
-		print_infos(lst->data);
+		print_infos(lst->data, max);
 		lst = lst->next;
 	}
 	delete_list(lst);

@@ -6,15 +6,12 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/08 20:06:23 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/09 15:47:46 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef		FT_LS_H
 # define	FT_LS_H
-
-# define TRUE 1
-# define FALSE 0
 
 # include <sys/types.h>
 # include <sys/stat.h>
@@ -39,17 +36,31 @@ typedef struct	s_opt
 	int nb_opt;
 }				t_opt;
 
+typedef struct s_max  t_max;
 typedef struct s_data t_data;
 typedef struct s_lst t_lst;
+typedef struct s_tm t_time;
 typedef struct dirent t_dir;
 typedef struct stat  t_stat;
 
+struct	s_max
+{
+	u_int	m_link;
+	u_int	m_uid;
+	u_int	m_gid;
+	u_int	m_size;
+	u_int	m_maj;
+	u_int	m_min;
+};
+
 struct	s_data
 {
-	int		link;
+	char	*link;
 	char	*uid;
 	char	*gid;
-	int		size;
+	char	*size;
+	char	*maj;
+	char	*min;
 	char	*date;
 	char	*name;
 	t_dir	*file;
@@ -66,9 +77,9 @@ struct	s_lst
 
 void	display(char * path, t_dir *file, t_lst *lst, int *nblock);
 t_opt	*singleton(void);
-void	print_infos(t_data *p_data);
+void	print_infos(t_data *p_data, t_max *max);
 t_lst	*add_link(t_data *data, t_lst *lst);
-void	disp_list(t_lst *lst, t_lst *first, t_lst *last, int *block);
+void	disp_list(t_lst *lst, t_lst *first, int *block, t_max *max);
 void	read_list(t_lst *lst, char *path, int *block);
 void    delete_list(t_lst *lst);
 
