@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/09 15:47:46 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/10 10:26:23 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ struct	s_max
 struct	s_data
 {
 	char	*link;
-	char	*uid;
+	char 	*uid;
 	char	*gid;
 	char	*size;
 	char	*maj;

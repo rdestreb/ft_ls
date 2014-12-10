@@ -6,14 +6,14 @@
 #    By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/03 12:22:32 by rdestreb          #+#    #+#              #
-#    Updated: 2014/12/05 11:33:10 by rdestreb         ###   ########.fr        #
+#    Updated: 2014/12/10 11:07:26 by rdestreb         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 NAME = libft.a
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -g -Wall -Wextra -Werror
 HEADERFILES = libft.h
 HEADERDIR = ./
 HEADER = $(addprefix $(HEADERDIR), $(HEADERFILES))

@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/09 16:04:24 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/10 15:18:38 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,16 +98,15 @@ void	padding(t_data *p_data, t_max *max)
 		p_data->link = ft_strjoin(" ", p_data->link);
 	ft_putstr(p_data->link);
 	ft_putstr(" ");
-	while(ft_strlen(p_data->uid) <= max->m_uid)
+	while(ft_strlen(p_data->uid) <= max->m_uid + 1)
 		p_data->uid = ft_strjoin(p_data->uid, " ");
 	ft_putstr(p_data->uid);
-	ft_putstr(" ");
 	while(ft_strlen(p_data->gid) <= max->m_gid)
 		p_data->gid = ft_strjoin(p_data->gid, " ");
 	ft_putstr(p_data->gid);
 	if (p_data->file->d_type == DT_BLK || p_data->file->d_type == DT_CHR)
 	{
-		while(ft_strlen(p_data->maj) <= max->m_maj)
+		while(ft_strlen(p_data->maj) <= max->m_maj + 1)
 			p_data->maj = ft_strjoin(" ", p_data->maj);
 		ft_putstr(p_data->maj);
 			ft_putstr(",");
@@ -172,6 +171,18 @@ void	get_time(t_stat *p_stat, t_data *p_data)
 		p_data->date = ft_strsub(t_f, 3, 13);
 }
 
+void	get_id(t_stat *p_stat, t_data *p_data)
+{
+	if (!(getpwuid(p_stat->st_uid)))
+		p_data->uid = ft_itoa(p_stat->st_uid);
+	else
+x		p_data->uid = getpwuid(p_stat->st_uid)->pw_name;
+	if (!(getgrgid(p_stat->st_gid)))
+		p_data->gid = ft_itoa(p_stat->st_gid);
+	else
+		p_data->gid =  getgrgid(p_stat->st_gid)->gr_name;
+}
+
 void	get_infos(t_stat *p_stat, t_dir *file, t_lst *lst, int *nblock)
 {
 	t_data		*p_data;
@@ -180,8 +191,7 @@ void	get_infos(t_stat *p_stat, t_dir *file, t_lst *lst, int *nblock)
 	   return ;
 	*nblock += p_stat->st_blocks;
 	p_data->link = ft_itoa(p_stat->st_nlink);
-	p_data->uid =  getpwuid(p_stat->st_uid)->pw_name;
-	p_data->gid =  getgrgid(p_stat->st_gid)->gr_name;
+	get_id(p_stat, p_data);
 	p_data->size = ft_itoa(p_stat->st_size);
 	get_time(p_stat, p_data);
 	if (file->d_type == DT_LNK)
@@ -201,23 +211,15 @@ void	read_dir(char *path)
 {
 	DIR		*dir;
 	t_dir	*file;
-	t_opt	*flag;
 	t_lst	*lst;
 	int		nblock;
 
 	nblock = 0;
-	flag = singleton();
 	if (!(dir = opendir(path)))
 		return (print_error(path));
 	lst = (t_lst *)ft_memalloc(sizeof(t_lst));
 	while ((file = readdir(dir)))
-	{
-		if (flag->a || (!(flag->a) && ft_strncmp(file->d_name, ".", 1)))
-			display(path, file ,lst, &nblock);
-		else if(flag->rec && ft_strcmp(file->d_name , ".")
-					&& ft_strcmp(file->d_name, ".."))
 			display(path, file, lst, &nblock);
-	}
 	if (closedir(dir) != 0)
 		return (print_error(""));
 	read_list(lst, path, &nblock);
