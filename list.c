@@ -6,23 +6,12 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/05 14:04:12 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/10 15:14:30 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/11 19:53:02 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-/*t_lst	*init_list(int reset)
-{
-	static t_lst	*lst = NULL;
-
-	if (reset)
-		lst = NULL;
-	if(!lst)
-		lst = (t_lst *)ft_memalloc(sizeof(t_lst));
-	return (lst);
-}
-*/
 t_lst	*tri(t_lst *lst, t_lst *add)
 {
 	t_opt	*flag;
@@ -32,15 +21,16 @@ t_lst	*tri(t_lst *lst, t_lst *add)
 	{
 		while ((flag->r && lst && lst->next &&
 				add->data->p_stat->st_mtime > lst->next->data->p_stat->st_mtime)
-			   || (!(flag->r) && lst && lst->next && add->data->p_stat->st_mtime
-				   <= lst->next->data->p_stat->st_mtime))
+				|| (!(flag->r) && lst && lst->next &&
+					add->data->p_stat->st_mtime
+					<= lst->next->data->p_stat->st_mtime))
 			lst = lst->next;
 	}
 	else
 	{
 		while ((!(flag->r) && lst && lst->next &&
 				(ft_strcmp(add->data->name, lst->next->data->name) > 0)) ||
-			   (flag->r && lst && lst->next &&
+				(flag->r && lst && lst->next &&
 				(ft_strcmp(add->data->name, lst->next->data->name) <= 0)))
 			lst = lst->next;
 	}
@@ -73,7 +63,7 @@ void	disp_list(t_lst *lst, t_lst *first, int *nblock, t_max *max)
 		ft_putstr("\n");
 	}
 	lst = first->next;
-	while(lst)
+	while (lst)
 	{
 		if (flag->a ||
 			(!(flag->a) && ft_strncmp(lst->data->file->d_name, ".", 1)))
@@ -82,7 +72,6 @@ void	disp_list(t_lst *lst, t_lst *first, int *nblock, t_max *max)
 	}
 	delete_list(lst);
 }
-
 
 void	delete_list(t_lst *lst)
 {
@@ -105,5 +94,3 @@ void	delete_list(t_lst *lst)
 	free(lst->path);
 	free(lst);
 }
-
-
