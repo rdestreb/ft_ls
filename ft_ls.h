@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/10 10:26:23 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/11 14:39:23 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,16 @@
 # include <time.h>
 # include "libft/libft.h"
 
-typedef struct	s_opt
+typedef struct s_opt  t_opt;
+typedef struct s_max  t_max;
+typedef struct s_data t_data;
+typedef struct s_lst t_lst;
+typedef struct s_tm t_time;
+typedef struct dirent t_dir;
+typedef struct stat  t_stat;
+typedef struct s_arg  t_arg;
+
+struct	s_opt
 {
 	int	l;
 	int	rec;
@@ -34,14 +43,7 @@ typedef struct	s_opt
 	int	r;
 	int	t;
 	int nb_opt;
-}				t_opt;
-
-typedef struct s_max  t_max;
-typedef struct s_data t_data;
-typedef struct s_lst t_lst;
-typedef struct s_tm t_time;
-typedef struct dirent t_dir;
-typedef struct stat  t_stat;
+};
 
 struct	s_max
 {
@@ -74,6 +76,12 @@ struct	s_lst
 	t_lst	*next;
 };
 
+struct	s_arg
+{
+	char	*arg;
+	int		cpt;
+	t_arg	*next;
+};
 
 void	display(char * path, t_dir *file, t_lst *lst, int *nblock);
 t_opt	*singleton(void);

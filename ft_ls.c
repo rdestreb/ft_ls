@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/10 15:18:38 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/11 14:53:58 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,7 @@ void	get_id(t_stat *p_stat, t_data *p_data)
 	if (!(getpwuid(p_stat->st_uid)))
 		p_data->uid = ft_itoa(p_stat->st_uid);
 	else
-x		p_data->uid = getpwuid(p_stat->st_uid)->pw_name;
+		p_data->uid = getpwuid(p_stat->st_uid)->pw_name;
 	if (!(getgrgid(p_stat->st_gid)))
 		p_data->gid = ft_itoa(p_stat->st_gid);
 	else
@@ -300,34 +300,77 @@ void	display(char *path, t_dir *file, t_lst *lst, int *nblock)
 	ft_strdel(&path2);
 }
 
+t_arg	*init_tri_arg(void)
+{
+	static t_arg *lst = NULL;
+
+	if (!lst)
+		lst = (t_arg *)ft_memalloc(sizeof(t_arg));
+	return(lst);
+}
+
+t_arg	*tri_arg(char *arg)
+{
+	t_arg		*lst;
+	t_arg		*add;
+	t_arg		*tmp;
+	t_opt		*flag;
+	static int	cpt = 0;
+
+	flag = singleton();
+	cpt++;
+	add = (t_arg *)ft_memalloc(sizeof(t_arg));
+	add->arg = ft_strdup(arg);
+	add->cpt = cpt;
+	lst = init_tri_arg();
+	if (!(flag->r))
+		while(lst && lst->next && ft_strcmp(add->arg, lst->next->arg) > 0)
+			lst = lst->next;
+	else
+		while(lst && lst->next && ft_strcmp(add->arg, lst->next->arg) <= 0)
+			lst = lst->next;
+	tmp = lst->next;
+	lst->next = add;
+	add->next = tmp;
+	return (lst);
+}
+
 int	main(int ac, char **av)
 {
 	t_opt	*flag;
-	int		arg;
+	t_arg	*p_arg;
+	int		nb_arg;
 
 	flag = arg_parser(ac, av);
-
-/*	ft_putnbr(flag->l);
-	ft_putnbr(flag->rec);
-	ft_putnbr(flag->a);
-	ft_putnbr(flag->r);
-	ft_putnbr(flag->t);
-	ft_putstr("\n");
-	ft_putnbr(flag->nb_opt);
-*/
-	arg = ac - flag->nb_opt - 1;
+	if(!(p_arg = (t_arg *)ft_memalloc(sizeof(t_arg))))
+		return (0);
+	nb_arg = ac - flag->nb_opt - 1;
 	if (ac == (flag->nb_opt + 1))
 		read_dir(".");
 	else
 	{
-		while(ac-- > 1 && (ac > flag->nb_opt))
+		while (ac-- > 1 && ac > flag->nb_opt )
+			p_arg = tri_arg(av[ac]);
+		p_arg = init_tri_arg();
+		p_arg = p_arg->next;
+		while (p_arg)
 		{
-			if (arg > 1)
+			//ft_putendl(p_arg->arg);
+			if (nb_arg > 1)
+				ft_putendl(ft_strjoin(p_arg->arg, ":"));
+			read_dir(p_arg->arg);
+			if (p_arg->cpt > 0)
+				ft_putstr("\n");
+			p_arg = p_arg->next;
+		}
+/*		while(ac-- > 1 && (ac > flag->nb_opt))
+		{
+			if (nb_arg > 1)
 				ft_putendl(ft_strjoin(av[ac], ":"));
 			read_dir(av[ac]);
-			if (arg > 1 && ac - flag->nb_opt <= arg && ac > flag->nb_opt + 1)
+			if (nb_arg > 1 && ac - flag->nb_opt <= nb_arg && ac > flag->nb_opt + 1)
 				ft_putstr("\n");
-		}
+				}*/
 	}
 	return (0);
 }
