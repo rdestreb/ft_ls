@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/11 19:47:32 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/11 20:33:45 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,9 @@ void	get_permission(int path, t_dir *file)
 {
 	if (file->d_type == DT_LNK)
 		ft_putstr("l");
-	if (file->d_type == DT_FIFO)
+	else if (file->d_type == DT_FIFO)
 		ft_putstr("p");
-	if (file->d_type == DT_SOCK)
+	else if (file->d_type == DT_SOCK)
 		ft_putstr("s");
 	else if (file->d_type == DT_BLK)
 		ft_putstr("b");
@@ -119,7 +119,7 @@ void	padding2(t_data *p_data, t_max *max)
 	}
 	else
 	{
-		while (ft_strlen(p_data->size) <= max->m_size)
+		while (ft_strlen(p_data->size) < max->m_size + max->m_min + max->m_maj)
 			p_data->size = ft_strjoin(" ", p_data->size);
 		ft_putstr(p_data->size);
 	}
@@ -132,10 +132,10 @@ void	padding(t_data *p_data, t_max *max)
 	ft_putstr(p_data->link);
 	ft_putstr(" ");
 	while (ft_strlen(p_data->uid) <= max->m_uid + 1)
-		p_data->uid = ft_strjoin(" ", p_data->uid);
+		p_data->uid = ft_strjoin(p_data->uid, " ");
 	ft_putstr(p_data->uid);
-	while (ft_strlen(p_data->gid) <= max->m_gid)
-		p_data->gid = ft_strjoin(" ", p_data->gid);
+	while (ft_strlen(p_data->gid) < max->m_gid)
+		p_data->gid = ft_strjoin(p_data->gid, " ");
 	ft_putstr(p_data->gid);
 }
 
@@ -353,7 +353,7 @@ void	disp_arg(t_arg *p_arg, int ac, char **av, int nb_arg)
 {
 	t_opt	*flag;
 
-	flag = arg_parser(ac, av);
+	flag = singleton();
 	while (ac-- > 1 && ac > flag->nb_opt)
 		p_arg = tri_arg(av[ac]);
 	p_arg = init_tri_arg();
