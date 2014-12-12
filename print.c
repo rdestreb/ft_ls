@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/12 10:49:18 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 10:49:21 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/12 18:52:23 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,42 +40,57 @@ void	get_permission(int path, t_dir *file)
 	ft_putstr(" ");
 }
 
-char	*cleaning(char *path)
+void	padding_size(t_data *p_data, t_max *max)
 {
 	char	*tmp;
 
-	tmp = path;
-	path = ft_strjoin(" ", path);
-	free(tmp);
-	return (path);
+	while (ft_strlen(p_data->size) <= max->m_size + 1 ||
+			(max->m_maj > 1 && ft_strlen(p_data->size) <=
+			max->m_size + max->m_min + max->m_maj + 2))
+	{
+		tmp = p_data->size;
+		p_data->size = ft_strjoin(" ", p_data->size);
+		free(tmp);
+	}
+	ft_putstr(p_data->size);
 }
 
 void	padding2(t_data *p_data, t_max *max)
 {
+	char	*tmp;
+
 	if (p_data->file->d_type == DT_BLK || p_data->file->d_type == DT_CHR)
 	{
 		while (ft_strlen(p_data->maj) <= max->m_maj + 1)
+		{
+			tmp = p_data->maj;
 			p_data->maj = ft_strjoin(" ", p_data->maj);
+			free(tmp);
+		}
 		ft_putstr(p_data->maj);
 		ft_putstr(",");
 		while (ft_strlen(p_data->min) <= max->m_min)
+		{
+			tmp = p_data->min;
 			p_data->min = ft_strjoin(" ", p_data->min);
+			free(tmp);
+		}
 		ft_putstr(p_data->min);
 	}
 	else
-	{
-		while (ft_strlen(p_data->size) <= max->m_size + 1 ||
-				(max->m_maj > 1 && ft_strlen(p_data->size) <=
-				max->m_size + max->m_min + max->m_maj + 2))
-			p_data->size = ft_strjoin(" ", p_data->size);
-		ft_putstr(p_data->size);
-	}
+		padding_size(p_data, max);
 }
 
 void	padding(t_data *p_data, t_max *max)
 {
+	char	*tmp;
+
 	while (ft_strlen(p_data->link) <= max->m_link)
+	{
+		tmp = p_data->link;
 		p_data->link = ft_strjoin(" ", p_data->link);
+		free(tmp);
+	}
 	ft_putstr(p_data->link);
 	ft_putstr(" ");
 	while (ft_strlen(p_data->uid) <= max->m_uid + 1)

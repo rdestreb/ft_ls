@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/05 14:04:12 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 09:52:47 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/12 15:40:50 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,8 @@ void	delete_list(t_lst *lst)
 		free(lst->data->gid);
 		free(lst->data->uid);
 		free(lst->data->size);
+		free(lst->data->maj);
+		free(lst->data->min);
 		free(lst->data->date);
 		free(lst->data->name);
 		free(lst->data->file);

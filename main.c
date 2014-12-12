@@ -6,17 +6,11 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/25 10:13:32 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 10:53:36 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/12 15:16:25 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
-
-void	print_error(char *error)
-{
-	ft_putstr_fd("ft_ls: ", 2);
-	perror(error);
-}
 
 t_arg	*init_tri_arg(void)
 {
@@ -33,13 +27,10 @@ t_arg	*tri_arg(char *arg)
 	t_arg		*add;
 	t_arg		*tmp;
 	t_opt		*flag;
-	static int	cpt = 0;
 
 	flag = singleton();
-	cpt++;
 	add = (t_arg *)ft_memalloc(sizeof(t_arg));
 	add->arg = ft_strdup(arg);
-	add->cpt = cpt;
 	lst = init_tri_arg();
 	if (!(flag->r))
 		while (lst && lst->next && ft_strcmp(add->arg, lst->next->arg) > 0)
@@ -71,6 +62,17 @@ void	disp_arg(t_arg *p_arg, int ac, char **av, int nb_arg)
 			ft_putstr("\n");
 		p_arg = p_arg->next;
 	}
+}
+
+void	delete_arg(t_arg *lst)
+{
+	if (!lst)
+		return ;
+	if (lst->next)
+		delete_arg(lst);
+	if (lst->arg)
+		free(lst->arg);
+	free(lst);
 }
 
 int		main(int ac, char **av)

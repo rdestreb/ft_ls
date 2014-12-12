@@ -6,11 +6,17 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/12 10:49:03 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 10:49:07 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/12 19:34:42 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
+
+void	print_error(char *error)
+{
+	ft_putstr_fd("ft_ls: ", 2);
+	perror(error);
+}
 
 void	read_dir(char *path)
 {
@@ -45,7 +51,10 @@ void	display(char *path, t_dir *file, t_lst *lst, int *nblock)
 
 	if (!(p_stat = (t_stat *)ft_memalloc(sizeof(t_stat))))
 		return ;
-	path2 = ft_strjoin(ft_strjoin(path, "/"), file->d_name);
+	if (ft_strequ("/", path))
+		path2 = ft_strjoin(path, file->d_name);
+	else
+		path2 = ft_strjoin(ft_strjoin(path, "/"), file->d_name);
 	lst->path = path2;
 	if (file->d_type == DT_LNK)
 		lstat(path2, p_stat);
@@ -67,7 +76,10 @@ void	recursive(t_lst *lst, char *path, t_lst *first)
 		if (file->d_type == DT_DIR && ft_strcmp(lst->data->name, ".") &&
 			ft_strcmp(lst->data->name, ".."))
 		{
-			path2 = ft_strjoin(ft_strjoin(path, "/"), lst->data->name);
+			if (ft_strequ("/", path))
+				path2 = ft_strjoin(path, lst->data->name);
+			else
+				path2 = ft_strjoin(ft_strjoin(path, "/"), lst->data->name);
 			ft_putendl(ft_strjoin(ft_strjoin("\n", path2), ":"));
 			read_dir(path2);
 			ft_strdel(&path2);

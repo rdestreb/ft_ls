@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 10:56:59 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/12 15:16:23 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,6 @@ struct	s_lst
 struct	s_arg
 {
 	char	*arg;
-	int		cpt;
 	t_arg	*next;
 };
 
