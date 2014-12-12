@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/12 10:49:40 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 10:49:43 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/12 19:52:19 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,10 @@ void	get_link(t_stat *p_stat, t_dir *file, t_lst *lst, t_data *p_data)
 	t_opt	*flag;
 
 	flag = singleton();
-	if (!(link = (char *)ft_memalloc(sizeof(int) * p_stat->st_size + 1)))
+	if (!(link = (char *)ft_memalloc(sizeof(char) * p_stat->st_size + 1)))
 		return (print_error(""));
 	if ((ret = readlink(lst->path, link, p_stat->st_size + 1)) == -1)
 		return (print_error(""));
-	link[p_stat->st_size + 1] = 0;
 	if (flag->l)
 		p_data->name = ft_strjoin(ft_strjoin(file->d_name, " -> "), link);
 	else

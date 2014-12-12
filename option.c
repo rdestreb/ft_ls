@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/12 10:48:48 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 10:48:53 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/12 20:00:15 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ t_opt	*arg_parser(int ac, char **av)
 
 	i = 0;
 	flag = singleton();
-	while (++i < ac && av[i][0] == '-')
+	while (++i < ac && av[i][0] == '-' && av[i][1])
 	{
 		illegal_option(av[i]);
 		flag->l = (ft_strchr(av[i], 'l') ? flag->l + 1 : flag->l);
