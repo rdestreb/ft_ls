@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/05 14:04:12 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/11 20:51:39 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/12 09:52:47 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,38 @@ t_lst	*add_link(t_data *data, t_lst *lst)
 	return (lst);
 }
 
+void	read_list(t_lst *lst, char *path, int *nblock)
+{
+	t_opt	*flag;
+	t_lst	*first;
+	t_max	*max;
+
+	flag = singleton();
+	max = (t_max *)ft_memalloc(sizeof(t_max));
+	first = lst;
+	lst = lst->next;
+	while (lst)
+	{
+		get_max(lst, max);
+		lst = lst->next;
+	}
+	disp_list(lst, first, nblock, max);
+	if (flag->rec)
+		recursive(lst, path, first);
+}
+
 void	disp_list(t_lst *lst, t_lst *first, int *nblock, t_max *max)
 {
 	t_opt	*flag;
 
 	flag = singleton();
-	if (flag->l)
+	lst = first->next;
+	if (flag->l && lst)
 	{
 		ft_putstr("total ");
 		ft_putnbr(*nblock);
 		ft_putstr("\n");
 	}
-	lst = first->next;
 	while (lst)
 	{
 		if (flag->a ||
