@@ -89,5 +89,6 @@ int		main(int ac, char **av)
 		read_dir(".");
 	else
 		disp_arg(p_arg, ac, av, nb_arg);
+	delete_arg(p_arg);
 	return (0);
 }

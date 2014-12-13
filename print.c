@@ -45,8 +45,8 @@ void	padding_size(t_data *p_data, t_max *max)
 	char	*tmp;
 
 	while (ft_strlen(p_data->size) <= max->m_size + 1 ||
-			(max->m_maj > 1 && ft_strlen(p_data->size) <=
-			max->m_size + max->m_min + max->m_maj + 2))
+			(max->m_maj &&
+				ft_strlen(p_data->size) <= max->m_min + max->m_maj + 3))
 	{
 		tmp = p_data->size;
 		p_data->size = ft_strjoin(" ", p_data->size);

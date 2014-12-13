@@ -19,7 +19,7 @@ void	get_link(t_stat *p_stat, t_dir *file, t_lst *lst, t_data *p_data)
 	t_opt	*flag;
 
 	flag = singleton();
-	if (!(link = (char *)ft_memalloc(sizeof(char) * p_stat->st_size + 1)))
+	if (!(link = (char *)ft_memalloc(sizeof(char) * p_stat->st_size + 2)))
 		return (print_error(""));
 	if ((ret = readlink(lst->path, link, p_stat->st_size + 1)) == -1)
 		return (print_error(""));
@@ -88,8 +88,8 @@ void	get_max(t_lst *lst, t_max *max)
 		max->m_link = ft_strlen(lst->data->link);
 	if (max->m_size < ft_strlen(lst->data->size))
 		max->m_size = ft_strlen(lst->data->size);
-	if (max->m_maj < ft_strlen(lst->data->maj))
+	if (ft_strcmp(lst->data->maj, "0") && max->m_maj < ft_strlen(lst->data->maj))
 		max->m_maj = ft_strlen(lst->data->maj);
-	if (max->m_min < ft_strlen(lst->data->min))
+	if (ft_strcmp(lst->data->min, "0") && max->m_min < ft_strlen(lst->data->min))
 		max->m_min = ft_strlen(lst->data->min);
 }

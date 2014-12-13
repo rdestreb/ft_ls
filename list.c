@@ -29,8 +29,10 @@ t_lst	*tri(t_lst *lst, t_lst *add)
 	else
 	{
 		while ((!(flag->r) && lst && lst->next &&
+				add->data->name && lst->next->data->name &&
 				(ft_strcmp(add->data->name, lst->next->data->name) > 0)) ||
 				(flag->r && lst && lst->next &&
+				add->data->name && lst->next->data->name &&
 				(ft_strcmp(add->data->name, lst->next->data->name) <= 0)))
 			lst = lst->next;
 	}
