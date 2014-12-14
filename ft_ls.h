@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/24 17:05:55 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 15:16:23 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/14 11:11:27 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,13 @@
 # include <grp.h>
 # include <time.h>
 # include "libft/libft.h"
+
+# define CYAN "\033[36;1m"
+# define B_CYAN "\033[2;34;46m"
+# define RED "\033[2;31m"
+# define MAGENTA "\033[2;35m"
+# define B_YELLOW "\033[2;34;43m"
+# define BLANK "\033[00m\n"
 
 typedef struct s_opt	t_opt;
 typedef struct s_max	t_max;

@@ -6,13 +6,13 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/12 10:49:40 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/14 09:42:19 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/14 10:41:45 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-void	get_link(t_stat *p_stat, t_dir *file, t_lst *lst, t_data *p_data)
+void	get_link(t_stat *p_stat, t_dir *file, t_lst *lst, t_data *data)
 {
 	char	*link;
 	int		ret;
@@ -24,9 +24,9 @@ void	get_link(t_stat *p_stat, t_dir *file, t_lst *lst, t_data *p_data)
 	if ((ret = readlink(lst->path, link, p_stat->st_size + 1)) == -1)
 		return (print_error(""));
 	if (flag->l)
-		p_data->name = ft_strjoin(ft_strjoin(file->d_name, " -> "), link);
+		data->name = ft_strjoin(ft_strjoin(file->d_name, "\033[00m -> "), link);
 	else
-		p_data->name = ft_strdup(file->d_name);
+		data->name = ft_strdup(file->d_name);
 }
 
 void	get_time(t_stat *p_stat, t_data *p_data)

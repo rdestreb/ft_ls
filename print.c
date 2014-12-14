@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/12 10:49:18 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/14 09:41:22 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/14 11:11:33 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,5 +114,18 @@ void	print_infos(t_data *p_data, t_max *max)
 		ft_putstr(p_data->date);
 		ft_putstr(" ");
 	}
-	ft_putendl(p_data->name);
+	if (p_data->file->d_type == DT_DIR)
+		ft_putstr(CYAN);
+	else if (p_data->file->d_type == DT_BLK)
+		ft_putstr(B_CYAN);
+	else if (p_data->file->d_type == DT_CHR)
+		ft_putstr(B_YELLOW);
+	else if (p_data->file->d_type == DT_LNK)
+		ft_putstr(MAGENTA);
+	else if (p_data->p_stat->st_mode & S_IXUSR ||
+				(p_data->p_stat->st_mode & S_IXGRP) ||
+				(p_data->p_stat->st_mode & S_IXOTH))
+		ft_putstr(RED);
+	ft_putstr(p_data->name);
+	ft_putstr(BLANK);
 }
