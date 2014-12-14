@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/12 10:49:18 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 18:52:23 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/14 09:41:22 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ void	padding_size(t_data *p_data, t_max *max)
 	char	*tmp;
 
 	while (ft_strlen(p_data->size) <= max->m_size + 1 ||
-			(max->m_maj &&
-				ft_strlen(p_data->size) <= max->m_min + max->m_maj + 3))
+			(max->m_maj && ft_strlen(p_data->size) <=
+				max->m_min + max->m_maj + 3))
 	{
 		tmp = p_data->size;
 		p_data->size = ft_strjoin(" ", p_data->size);

@@ -6,7 +6,7 @@
 /*   By: rdestreb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/12 10:49:40 by rdestreb          #+#    #+#             */
-/*   Updated: 2014/12/12 19:52:19 by rdestreb         ###   ########.fr       */
+/*   Updated: 2014/12/14 09:42:19 by rdestreb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,10 @@ void	get_max(t_lst *lst, t_max *max)
 		max->m_link = ft_strlen(lst->data->link);
 	if (max->m_size < ft_strlen(lst->data->size))
 		max->m_size = ft_strlen(lst->data->size);
-	if (ft_strcmp(lst->data->maj, "0") && max->m_maj < ft_strlen(lst->data->maj))
+	if (ft_strcmp(lst->data->maj, "0") &&
+		max->m_maj < ft_strlen(lst->data->maj))
 		max->m_maj = ft_strlen(lst->data->maj);
-	if (ft_strcmp(lst->data->min, "0") && max->m_min < ft_strlen(lst->data->min))
+	if (ft_strcmp(lst->data->min, "0") &&
+		max->m_min < ft_strlen(lst->data->min))
 		max->m_min = ft_strlen(lst->data->min);
 }
